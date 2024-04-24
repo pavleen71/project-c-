@@ -30,8 +30,9 @@ public class GameBoard //pavleen kaur
     // Display the current state of the game board
     public void DisplayBoard() //Gursharandeep Singh
     {
-         Console.Clear();  // Clear the console
-        Console.WriteLine("Connect Four Game"); // Print the heading
+        Console.Clear();  // Clear the console
+        Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game"); // Print the heading
+        Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine(" 1 2 3 4 5 6 7");
         for (int row = 0; row < Rows; row++)
@@ -229,9 +230,10 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
     // Start the game
     public void StartGame()
     {
-        Console.WriteLine("Connect Four Game");
+        Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game");
         Console.WriteLine();
-
+        Console.WriteLine();
+        
         // Set player names
         player1.Name = GetPlayerName(player1.Name, 1);
         player2.Name = GetPlayerName(player2.Name, 2);
@@ -340,7 +342,8 @@ class Program
     static void Main(string[] args)
     {
         // Display game options
-        Console.WriteLine("Connect Four Game");
+        Console.WriteLine("".PadLeft((Console.WindowWidth - "LET'S PLAY CONNECT4GAME".Length) / 2) + "LET'S PLAY CONNECT4GAME");
+        Console.WriteLine();
         Console.WriteLine("Choose the type of game:");
         Console.WriteLine("1. Player vs Player");
         Console.WriteLine("2. Player vs AI ");
