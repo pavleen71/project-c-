@@ -3,7 +3,7 @@ using System;
 // Represents the game board
 public class GameBoard //pavleen kaur
 {
-    public const int Rows = 6;
+    private const int Rows = 6;
     public const int Cols = 7;
 
     private readonly char[,] board;
@@ -30,10 +30,11 @@ public class GameBoard //pavleen kaur
     // Display the current state of the game board
     public void DisplayBoard() //Gursharandeep Singh
     {
-        Console.Clear();  // Clear the console
-        Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game"); // Print the heading
+        Console.Clear(); // Clear the console
+        Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game");
         Console.WriteLine();
         Console.WriteLine();
+
         Console.WriteLine(" 1 2 3 4 5 6 7");
         for (int row = 0; row < Rows; row++)
         {
@@ -233,7 +234,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
         Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game");
         Console.WriteLine();
         Console.WriteLine();
-        
+
         // Set player names
         player1.Name = GetPlayerName(player1.Name, 1);
         player2.Name = GetPlayerName(player2.Name, 2);
@@ -250,17 +251,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
             if (board.CheckWin(currentPlayer.Symbol))
             {
                 Console.WriteLine($"{currentPlayer.Name} wins!");
-                if (currentPlayer == player1)
-                {
-                    player1Wins++;
-                }
-                else
-                {
-                    player2Wins++;
-                }
-                totalGames++;
-                DisplayStatistics();
-                // Ask if the players want to play again
+                UpdateStatistics(currentPlayer);
                 if (!PlayAgain())
                 {
                     break;
@@ -274,9 +265,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
             if (board.IsFull())
             {
                 Console.WriteLine("It's a draw!");
-                totalGames++;
-                DisplayStatistics();
-                // Ask if the players want to play again
+                UpdateStatistics(null);
                 if (!PlayAgain())
                 {
                     break;
@@ -319,8 +308,23 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
         }
     }
 
+    // Update game statistics
+    private void UpdateStatistics(Player winner)
+    {
+        totalGames++;
+        if (winner == player1)
+        {
+            player1Wins++;
+        }
+        else if (winner == player2)
+        {
+            player2Wins++;
+        }
+        DisplayStatistics();
+    }
+
     // Display game statistics
-    private void DisplayStatistics() //Gursharandeep Singh
+    private void DisplayStatistics()
     {
         Console.WriteLine("Game Statistics:");
         Console.WriteLine($"Total Games Played: {totalGames}");
@@ -369,7 +373,7 @@ class Program
         {
             player2 = new AIPlayer { Symbol = 'O' };
         }
-
+        
         // Initialize and start the game
         GameManager game = new GameManager(player1, player2);
         game.StartGame();
