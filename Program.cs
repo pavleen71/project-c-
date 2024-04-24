@@ -30,6 +30,7 @@ public class GameBoard //pavleen kaur
     // Display the current state of the game board
     public void DisplayBoard() //Gursharandeep Singh
     {
+         Console.Clear();
         Console.WriteLine(" 1 2 3 4 5 6 7");
         for (int row = 0; row < Rows; row++)
         {
