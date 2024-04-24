@@ -1,13 +1,17 @@
-﻿using System;
+using System;
 
 public class GameBoard
 {
-    private char[,] board; // 2D array to represent the game board
+    private readonly char[,] board;
 
     public GameBoard()
     {
-        // Initialize the game board with empty spaces
         board = new char[6, 7];
+        InitializeBoard();
+    }
+
+    private void InitializeBoard()
+    {
         for (int row = 0; row < 6; row++)
         {
             for (int col = 0; col < 7; col++)
@@ -118,14 +122,31 @@ public class GameBoard
 
         return false;
     }
+
+    public bool IsFull()
+    {
+        for (int col = 0; col < 7; col++)
+        {
+            if (board[0, col] == '-')
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
-public class Player
+public abstract class Player
 {
     public string Name { get; set; }
     public char Symbol { get; set; }
 
-    public virtual int GetMove(GameBoard board)
+    public abstract int GetMove(GameBoard board);
+}
+
+public class HumanPlayer : Player
+{
+    public override int GetMove(GameBoard board)
     {
         while (true)
         {
@@ -145,30 +166,26 @@ public class Player
     }
 }
 
-public class HumanPlayer : Player
-{
-    // No additional methods needed for human player
-}
-
 public class ComputerPlayer : Player
 {
     public override int GetMove(GameBoard board)
     {
         Random random = new Random();
-        int column = random.Next(1, 8); // Randomly choose a column
-        while (!board.MakeMove(column, Symbol))
+        int column;
+        do
         {
-            column = random.Next(1, 8); // Try again if column is full
-        }
+            column = random.Next(1, 8); // Randomly choose a column
+        } while (!board.MakeMove(column, Symbol));
+
         return column;
     }
 }
 
 public class GameManager
 {
-    private GameBoard board;
-    private Player player1;
-    private Player player2;
+    private readonly GameBoard board;
+    private readonly Player player1;
+    private readonly Player player2;
 
     public GameManager(Player p1, Player p2)
     {
@@ -180,7 +197,14 @@ public class GameManager
     public void StartGame()
     {
         Console.WriteLine("Connect Four Game");
-        Console.WriteLine("Player 1 (X) vs. Player 2 (O)");
+        Console.WriteLine();
+
+        Console.Write("Enter name for Player 1 (X): ");
+        player1.Name = Console.ReadLine();
+
+        Console.Write("Enter name for Player 2 (O): ");
+        player2.Name = Console.ReadLine();
+
         Console.WriteLine();
 
         board.DisplayBoard();
@@ -197,7 +221,7 @@ public class GameManager
                 break;
             }
 
-            if (IsBoardFull())
+            if (board.IsFull())
             {
                 Console.WriteLine("It's a draw!");
                 break;
@@ -206,19 +230,6 @@ public class GameManager
             currentPlayer = (currentPlayer == player1) ? player2 : player1;
         }
     }
-
-    private bool IsBoardFull()
-    {
-        for (int col = 0; col < 7; col++)
-        {
-            if (board.MakeMove(col + 1, 'T')) // Try to make a move with 'T' symbol
-            {
-                board.MakeMove(col + 1, '-'); // Undo the move
-                return false; // Board is not full
-            }
-        }
-        return true; // Board is full
-    }
 }
 
 class Program
@@ -226,7 +237,7 @@ class Program
     static void Main(string[] args)
     {
         HumanPlayer player1 = new HumanPlayer { Name = "Player 1", Symbol = 'X' };
-        ComputerPlayer player2 = new ComputerPlayer { Name = "Computer", Symbol = 'O' };
+        HumanPlayer player2 = new HumanPlayer { Name = "Player 2", Symbol = 'O' };
 
         GameManager game = new GameManager(player1, player2);
         game.StartGame();
