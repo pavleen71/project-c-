@@ -3,21 +3,24 @@ using System;
 // Represents the game board
 public class GameBoard //pavleen kaur
 {
+    public const int Rows = 6;
+    public const int Cols = 7;
+
     private readonly char[,] board;
 
     // Constructor to initialize the game board
     public GameBoard()
     {
-        board = new char[6, 7];
+        board = new char[Rows, Cols];
         InitializeBoard();
     }
 
     // Initialize the game board with empty cells
     public void InitializeBoard() //pavleen kaur
     {
-        for (int row = 0; row < 6; row++)
+        for (int row = 0; row < Rows; row++)
         {
-            for (int col = 0; col < 7; col++)
+            for (int col = 0; col < Cols; col++)
             {
                 board[row, col] = '-';
             }
@@ -28,10 +31,10 @@ public class GameBoard //pavleen kaur
     public void DisplayBoard() //Gursharandeep Singh
     {
         Console.WriteLine(" 1 2 3 4 5 6 7");
-        for (int row = 0; row < 6; row++)
+        for (int row = 0; row < Rows; row++)
         {
             Console.Write("|");
-            for (int col = 0; col < 7; col++)
+            for (int col = 0; col < Cols; col++)
             {
                 Console.Write(board[row, col] + "|");
             }
@@ -44,7 +47,7 @@ public class GameBoard //pavleen kaur
     public bool MakeMove(int column, char symbol) //Gursharandeep Singh
     {
         // Check if the column number is valid
-        if (column < 1 || column > 7)
+        if (column < 1 || column > Cols)
         {
             Console.WriteLine("Invalid column number. Please choose a column from 1 to 7.");
             return false;
@@ -52,7 +55,7 @@ public class GameBoard //pavleen kaur
 
         int colIndex = column - 1;
         // Find the first available row in the column
-        for (int row = 5; row >= 0; row--)
+        for (int row = Rows - 1; row >= 0; row--)
         {
             if (board[row, colIndex] == '-')
             {
@@ -69,9 +72,9 @@ public class GameBoard //pavleen kaur
     public bool CheckWin(char symbol) //Pavleen kaur and Gursharandeep Singh
     {
         // Check horizontally
-        for (int row = 0; row < 6; row++)
+        for (int row = 0; row < Rows; row++)
         {
-            for (int col = 0; col < 4; col++)
+            for (int col = 0; col < Cols - 3; col++)
             {
                 if (board[row, col] == symbol &&
                     board[row, col + 1] == symbol &&
@@ -84,9 +87,9 @@ public class GameBoard //pavleen kaur
         }
 
         // Check vertically
-        for (int row = 0; row < 3; row++)
+        for (int row = 0; row < Rows - 3; row++)
         {
-            for (int col = 0; col < 7; col++)
+            for (int col = 0; col < Cols; col++)
             {
                 if (board[row, col] == symbol &&
                     board[row + 1, col] == symbol &&
@@ -99,9 +102,9 @@ public class GameBoard //pavleen kaur
         }
 
         // Check diagonally (down-right)
-        for (int row = 0; row < 3; row++)
+        for (int row = 0; row < Rows - 3; row++)
         {
-            for (int col = 0; col < 4; col++)
+            for (int col = 0; col < Cols - 3; col++)
             {
                 if (board[row, col] == symbol &&
                     board[row + 1, col + 1] == symbol &&
@@ -114,9 +117,9 @@ public class GameBoard //pavleen kaur
         }
 
         // Check diagonally (up-right)
-        for (int row = 3; row < 6; row++)
+        for (int row = 3; row < Rows; row++)
         {
-            for (int col = 0; col < 4; col++)
+            for (int col = 0; col < Cols - 3; col++)
             {
                 if (board[row, col] == symbol &&
                     board[row - 1, col + 1] == symbol &&
@@ -134,7 +137,7 @@ public class GameBoard //pavleen kaur
     // Check if the game board is full
     public bool IsFull() //Gursharandeep Singh
     {
-        for (int col = 0; col < 7; col++)
+        for (int col = 0; col < Cols; col++)
         {
             if (board[0, col] == '-')
             {
@@ -195,7 +198,7 @@ public class AIPlayer : Player  //Gursharandeep Singh
         int column;
         do
         {
-            column = random.Next(1, 8); // Randomly choose a column
+            column = random.Next(1, GameBoard.Cols + 1); // Randomly choose a column
         } while (!board.MakeMove(column, Symbol));
 
         return column;
@@ -253,17 +256,13 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
                 totalGames++;
                 DisplayStatistics();
                 // Ask if the players want to play again
-                if (PlayAgain())
-                {
-                    board.InitializeBoard();
-                    board.DisplayBoard();
-                    currentPlayer = player1;
-                    continue;
-                }
-                else
+                if (!PlayAgain())
                 {
                     break;
                 }
+                ResetGame();
+                currentPlayer = player1;
+                continue;
             }
 
             // Check if the game is a draw
@@ -273,17 +272,13 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
                 totalGames++;
                 DisplayStatistics();
                 // Ask if the players want to play again
-                if (PlayAgain())
-                {
-                    board.InitializeBoard();
-                    board.DisplayBoard();
-                    currentPlayer = player1;
-                    continue;
-                }
-                else
+                if (!PlayAgain())
                 {
                     break;
                 }
+                ResetGame();
+                currentPlayer = player1;
+                continue;
             }
 
             // Switch players
@@ -327,6 +322,13 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
         Console.WriteLine($"{player1.Name} Wins: {player1Wins}");
         Console.WriteLine($"{player2.Name} Wins: {player2Wins}");
     }
+
+    // Reset the game
+    private void ResetGame()
+    {
+        board.InitializeBoard();
+        board.DisplayBoard();
+    }
 }
 
 // Main program  //Pavleen kaur and Gursharandeep Singh
@@ -338,7 +340,7 @@ class Program
         Console.WriteLine("Connect Four Game");
         Console.WriteLine("Choose the type of game:");
         Console.WriteLine("1. Player vs Player");
-        Console.WriteLine("2. Player vs AI (Random Move)");
+        Console.WriteLine("2. Player vs AI ");
         Console.Write("Enter your choice: ");
 
         int choice;
