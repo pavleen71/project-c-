@@ -236,6 +236,25 @@ public class GameManager
         }
     }
 }
+//added replay functionality
+    private bool PlayAgain()
+    {
+        while (true)
+        {
+            Console.Write("Do you want to play again? (Y/N): ");
+            string input = Console.ReadLine().Trim().ToUpper();
+
+            if (input == "Y" || input == "N")
+            {
+                return input == "Y";
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter 'Y' or 'N'.");
+            }
+        }
+    }
+}
 
 class Program
 {
