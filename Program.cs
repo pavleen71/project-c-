@@ -166,7 +166,7 @@ public class HumanPlayer : Player
     }
 }
 
-public class ComputerPlayer : Player
+public class AIPlayer : Player
 {
     public override int GetMove(GameBoard board)
     {
@@ -199,13 +199,18 @@ public class GameManager
         Console.WriteLine("Connect Four Game");
         Console.WriteLine();
 
-        Console.Write("Enter name for Player 1 (X): ");
-        player1.Name = Console.ReadLine();
-
-        Console.Write("Enter name for Player 2 (O): ");
-        player2.Name = Console.ReadLine();
-
-        Console.WriteLine();
+        if (player2 is AIPlayer)
+        {
+            Console.Write("Enter your name: ");
+            player1.Name = Console.ReadLine();
+        }
+        else
+        {
+            Console.Write("Enter name for Player 1 (X): ");
+            player1.Name = Console.ReadLine();
+            Console.Write("Enter name for Player 2 (O): ");
+            player2.Name = Console.ReadLine();
+        }
 
         board.DisplayBoard();
 
@@ -236,8 +241,30 @@ class Program
 {
     static void Main(string[] args)
     {
-        HumanPlayer player1 = new HumanPlayer { Name = "Player 1", Symbol = 'X' };
-        HumanPlayer player2 = new HumanPlayer { Name = "Player 2", Symbol = 'O' };
+        Console.WriteLine("Connect Four Game");
+        Console.WriteLine("Choose the type of game:");
+        Console.WriteLine("1. Player vs Player");
+        Console.WriteLine("2. Player vs AI (Random Move)");
+        Console.Write("Enter your choice: ");
+
+        int choice;
+        while (!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2))
+        {
+            Console.WriteLine("Invalid choice. Please enter 1 or 2.");
+            Console.Write("Enter your choice: ");
+        }
+
+        Player player1 = new HumanPlayer { Symbol = 'X' };
+        Player player2;
+
+        if (choice == 1)
+        {
+            player2 = new HumanPlayer { Symbol = 'O' };
+        }
+        else
+        {
+            player2 = new AIPlayer { Symbol = 'O' };
+        }
 
         GameManager game = new GameManager(player1, player2);
         game.StartGame();
