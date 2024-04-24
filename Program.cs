@@ -1,14 +1,21 @@
 using System;
 
+// Interface for players
+public interface IPlayer // Gursharandeep Singh
+{
+    string Name { get; set; }
+    char Symbol { get; set; }
+    int GetMove(GameBoard board);
+}
+
 // Represents the game board
-public class GameBoard //pavleen kaur
+public class GameBoard // Pavleen kaur
 {
     private const int Rows = 6;
     public const int Cols = 7;
 
     private readonly char[,] board;
 
-    // Constructor to initialize the game board
     public GameBoard()
     {
         board = new char[Rows, Cols];
@@ -16,7 +23,7 @@ public class GameBoard //pavleen kaur
     }
 
     // Initialize the game board with empty cells
-    public void InitializeBoard() //pavleen kaur
+    public void InitializeBoard() // Pavleen kaur
     {
         for (int row = 0; row < Rows; row++)
         {
@@ -28,7 +35,7 @@ public class GameBoard //pavleen kaur
     }
 
     // Display the current state of the game board
-    public void DisplayBoard() //Gursharandeep Singh
+    public void DisplayBoard() // Gursharandeep Singh
     {
         Console.Clear(); // Clear the console
         Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game");
@@ -49,7 +56,7 @@ public class GameBoard //pavleen kaur
     }
 
     // Make a move in the specified column with the given symbol
-    public bool MakeMove(int column, char symbol) //Gursharandeep Singh
+    public bool MakeMove(int column, char symbol) // Gursharandeep Singh
     {
         // Check if the column number is valid
         if (column < 1 || column > Cols)
@@ -74,7 +81,7 @@ public class GameBoard //pavleen kaur
     }
 
     // Check if the given symbol has won the game
-    public bool CheckWin(char symbol) //Pavleen kaur and Gursharandeep Singh
+    public bool CheckWin(char symbol) // Pavleen kaur and Gursharandeep Singh
     {
         // Check horizontally
         for (int row = 0; row < Rows; row++)
@@ -140,7 +147,7 @@ public class GameBoard //pavleen kaur
     }
 
     // Check if the game board is full
-    public bool IsFull() //Gursharandeep Singh
+    public bool IsFull() // Gursharandeep Singh
     {
         for (int col = 0; col < Cols; col++)
         {
@@ -153,21 +160,14 @@ public class GameBoard //pavleen kaur
     }
 }
 
-// Represents a player in the game
-public abstract class Player //Pavleen kaur
+// Represents a human player
+public class HumanPlayer : IPlayer // Pavleen kaur
 {
     public string Name { get; set; }
     public char Symbol { get; set; }
 
-    // Abstract method to get the player's move
-    public abstract int GetMove(GameBoard board);
-}
-
-// Represents a human player
-public class HumanPlayer : Player  //Pavlenn kaur
-{
     // Get the human player's move from the console input
-    public override int GetMove(GameBoard board)
+    public int GetMove(GameBoard board) // Pavleen kaur
     {
         while (true)
         {
@@ -184,12 +184,16 @@ public class HumanPlayer : Player  //Pavlenn kaur
                 Console.WriteLine("Invalid input. Please enter a valid column number.");
             }
         }
+
     }
 }
 
 // Represents an AI player
-public class AIPlayer : Player  //Gursharandeep Singh
+public class AIPlayer : IPlayer // Gursharandeep Singh
 {
+    public string Name { get; set; }
+    public char Symbol { get; set; }
+
     // Constructor to set the name of the AI player
     public AIPlayer()
     {
@@ -197,7 +201,7 @@ public class AIPlayer : Player  //Gursharandeep Singh
     }
 
     // Get the AI player's move by choosing a random column
-    public override int GetMove(GameBoard board)
+    public int GetMove(GameBoard board) // Gursharandeep Singh
     {
         Random random = new Random();
         int column;
@@ -207,21 +211,22 @@ public class AIPlayer : Player  //Gursharandeep Singh
         } while (!board.MakeMove(column, Symbol));
 
         return column;
+
     }
 }
 
 // Manages the game flow
-public class GameManager  // Gursharandeep Singh and Pavleen kaur
+public class GameManager // Gursharandeep Singh and Pavleen kaur
 {
     private readonly GameBoard board;
-    private readonly Player player1;
-    private readonly Player player2;
+    private readonly IPlayer player1;
+    private readonly IPlayer player2;
     private int player1Wins;
     private int player2Wins;
     private int totalGames;
 
     // Constructor to initialize the game manager with players
-    public GameManager(Player p1, Player p2)
+    public GameManager(IPlayer p1, IPlayer p2) // Gursharandeep Singh
     {
         board = new GameBoard();
         player1 = p1;
@@ -229,7 +234,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
     }
 
     // Start the game
-    public void StartGame()
+    public void StartGame() // Gursharandeep Singh and Pavleen kaur
     {
         Console.WriteLine("".PadLeft((Console.WindowWidth - "Connect Four Game".Length) / 2) + "Connect Four Game");
         Console.WriteLine();
@@ -241,7 +246,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
 
         board.DisplayBoard();
 
-        Player currentPlayer = player1;
+        IPlayer currentPlayer = player1;
         while (true)
         {
             int column = currentPlayer.GetMove(board);
@@ -251,7 +256,17 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
             if (board.CheckWin(currentPlayer.Symbol))
             {
                 Console.WriteLine($"{currentPlayer.Name} wins!");
-                UpdateStatistics(currentPlayer);
+                if (currentPlayer == player1)
+                {
+                    player1Wins++;
+                }
+                else
+                {
+                    player2Wins++;
+                }
+                totalGames++;
+                DisplayStatistics();
+                // Ask if the players want to play again
                 if (!PlayAgain())
                 {
                     break;
@@ -265,7 +280,9 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
             if (board.IsFull())
             {
                 Console.WriteLine("It's a draw!");
-                UpdateStatistics(null);
+                totalGames++;
+                DisplayStatistics();
+                // Ask if the players want to play again
                 if (!PlayAgain())
                 {
                     break;
@@ -281,7 +298,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
     }
 
     // Get the player's name from the console input
-    private string GetPlayerName(string defaultName, int playerNumber) //Gursharandeep Singh
+    private string GetPlayerName(string defaultName, int playerNumber) // Gursharandeep Singh
     {
         string defaultPlayerName = playerNumber == 1 ? "Player 1" : "Player 2";
         Console.Write($"Enter name for {defaultName ?? defaultPlayerName}: ");
@@ -290,7 +307,7 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
     }
 
     // Ask the players if they want to play again
-    private bool PlayAgain() //Pavleen kaur
+    private bool PlayAgain() // Pavleen kaur
     {
         while (true)
         {
@@ -308,23 +325,8 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
         }
     }
 
-    // Update game statistics
-    private void UpdateStatistics(Player winner)
-    {
-        totalGames++;
-        if (winner == player1)
-        {
-            player1Wins++;
-        }
-        else if (winner == player2)
-        {
-            player2Wins++;
-        }
-        DisplayStatistics();
-    }
-
     // Display game statistics
-    private void DisplayStatistics()
+    private void DisplayStatistics() // Gursharandeep Singh
     {
         Console.WriteLine("Game Statistics:");
         Console.WriteLine($"Total Games Played: {totalGames}");
@@ -333,19 +335,24 @@ public class GameManager  // Gursharandeep Singh and Pavleen kaur
     }
 
     // Reset the game
-    private void ResetGame()
+    private void ResetGame() // Pavleen kaur
     {
         board.InitializeBoard();
         board.DisplayBoard();
     }
 }
 
-// Main program  //Pavleen kaur and Gursharandeep Singh
+// Main program  // Pavleen kaur and Gursharandeep Singh
 class Program
 {
     static void Main(string[] args)
     {
-        // Display game options
+        StartNewGame();
+    }
+
+    static void StartNewGame()
+    {
+        Console.Clear();
         Console.WriteLine("".PadLeft((Console.WindowWidth - "LET'S PLAY CONNECT4GAME".Length) / 2) + "LET'S PLAY CONNECT4GAME");
         Console.WriteLine();
         Console.WriteLine("Choose the type of game:");
@@ -360,25 +367,36 @@ class Program
             Console.WriteLine("Invalid choice. Please enter 1 or 2.");
             Console.Write("Enter your choice: ");
         }
+        // Create players based on user choice
+        IPlayer player1 = new HumanPlayer { Symbol = 'X' };
+        IPlayer player2 = choice == 1 ? new HumanPlayer { Symbol = 'O' } : new AIPlayer { Symbol = 'O' };
 
-        Player player1 = new HumanPlayer { Symbol = 'X' };
-        Player player2;
-
-        // Set player 2 based on game mode
-        if (choice == 1)
-        {
-            player2 = new HumanPlayer { Symbol = 'O' };
-        }
-        else
-        {
-            player2 = new AIPlayer { Symbol = 'O' };
-        }
-        
-        // Initialize and start the game
+        // Initialize game manager with players
         GameManager game = new GameManager(player1, player2);
         game.StartGame();
 
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadKey();
+        // After the game ends, ask if the user wants to restart from the beginning
+        bool validChoice = false;
+        while (!validChoice)
+        {
+            Console.WriteLine("Do you want to restart from the beginning? (Y/N): ");
+            string restartChoice = Console.ReadLine().Trim().ToUpper();
+            if (restartChoice == "Y")
+            {
+                validChoice = true;
+                StartNewGame(); // Restart the game
+            }
+            else if (restartChoice == "N")
+            {
+                validChoice = true;
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice. Please enter 'Y' to restart or 'N' to exit.");
+            }
+        }
     }
 }
+
