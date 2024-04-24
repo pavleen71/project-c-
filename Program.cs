@@ -176,7 +176,7 @@ public class AIPlayer : Player
         {
             column = random.Next(1, 8); // Randomly choose a column
         } while (!board.MakeMove(column, Symbol));
-
+         Console.WriteLine($"AI dropped {Symbol} to {column}");
         return column;
     }
 }
