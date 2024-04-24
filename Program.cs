@@ -202,52 +202,71 @@ public class GameManager
         Console.WriteLine("Connect Four Game");
         Console.WriteLine();
 
-        Console.Write("Enter name for Player 1 (X): ");
-        player1.Name = Console.ReadLine();
+        player1.Name = GetPlayerName(player1.Name, 1);
+        player2.Name = GetPlayerName(player2.Name, 2);
 
-        if (player2 is AIPlayer)
-        {
-            player2.Name = "AI";
-        }
-        else
-        {
-            Console.Write("Enter name for Player 2 (O): ");
-            player2.Name = Console.ReadLine();
-        }
+        board.DisplayBoard();
 
-        do
+        Player currentPlayer = player1;
+        while (true)
         {
-            board.InitializeBoard();
-
+            int column = currentPlayer.GetMove(board);
             board.DisplayBoard();
 
-            Player currentPlayer = player1;
-            while (true)
+            if (board.CheckWin(currentPlayer.Symbol))
             {
-                int column = currentPlayer.GetMove(board);
-                board.DisplayBoard();
-
-                if (board.CheckWin(currentPlayer.Symbol))
+                Console.WriteLine($"{currentPlayer.Name} wins!");
+                if (currentPlayer == player1)
                 {
-                    Console.WriteLine($"{currentPlayer.Name} wins!");
-                    UpdateStatistics(currentPlayer);
+                    player1Wins++;
+                }
+                else
+                {
+                    player2Wins++;
+                }
+                totalGames++;
+                DisplayStatistics();
+                if (PlayAgain())
+                {
+                    board.InitializeBoard();
+                    board.DisplayBoard();
+                    currentPlayer = player1;
+                    continue;
+                }
+                else
+                {
                     break;
                 }
-
-                if (board.IsFull())
-                {
-                    Console.WriteLine("It's a draw!");
-                    break;
-                }
-
-                currentPlayer = (currentPlayer == player1) ? player2 : player1;
             }
 
-            totalGames++;
+            if (board.IsFull())
+            {
+                Console.WriteLine("It's a draw!");
+                totalGames++;
+                DisplayStatistics();
+                if (PlayAgain())
+                {
+                    board.InitializeBoard();
+                    board.DisplayBoard();
+                    currentPlayer = player1;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
-        } while (PlayAgain());
+            currentPlayer = (currentPlayer == player1) ? player2 : player1;
+        }
+    }
 
-        DisplayStatistics();
+    private string GetPlayerName(string defaultName, int playerNumber)
+    {
+        string defaultPlayerName = playerNumber == 1 ? "Player 1" : "Player 2";
+        Console.Write($"Enter name for {defaultName ?? defaultPlayerName}: ");
+        string name = Console.ReadLine();
+        return string.IsNullOrWhiteSpace(name) ? defaultName ?? defaultPlayerName : name;
     }
 
     private bool PlayAgain()
@@ -257,13 +276,9 @@ public class GameManager
             Console.Write("Do you want to play again? (Y/N): ");
             string input = Console.ReadLine().Trim().ToUpper();
 
-            if (input == "Y")
+            if (input == "Y" || input == "N")
             {
-                return true;
-            }
-            else if (input == "N")
-            {
-                return false;
+                return input == "Y";
             }
             else
             {
@@ -272,26 +287,12 @@ public class GameManager
         }
     }
 
-    private void UpdateStatistics(Player player)
-    {
-        if (player == player1)
-        {
-            player1Wins++;
-        }
-        else
-        {
-            player2Wins++;
-        }
-    }
-
     private void DisplayStatistics()
     {
         Console.WriteLine("Game Statistics:");
-        Console.WriteLine($"Total games played: {totalGames}");
-        Console.WriteLine($"{player1.Name} wins: {player1Wins}");
-        Console.WriteLine($"{player2.Name} wins: {player2Wins}");
-        Console.WriteLine($"Win ratio for {player1.Name}: {(double)player1Wins / totalGames:P2}");
-        Console.WriteLine($"Win ratio for {player2.Name}: {(double)player2Wins / totalGames:P2}");
+        Console.WriteLine($"Total Games Played: {totalGames}");
+        Console.WriteLine($"{player1.Name} Wins: {player1Wins}");
+        Console.WriteLine($"{player2.Name} Wins: {player2Wins}");
     }
 }
 
