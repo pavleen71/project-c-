@@ -10,7 +10,7 @@ public class GameBoard
         InitializeBoard();
     }
 
-    private void InitializeBoard()
+    public void InitializeBoard()
     {
         for (int row = 0; row < 6; row++)
         {
@@ -176,7 +176,7 @@ public class AIPlayer : Player
         {
             column = random.Next(1, 8); // Randomly choose a column
         } while (!board.MakeMove(column, Symbol));
-        Console.WriteLine($"Computer selected {column} to drop");
+
         return column;
     }
 }
@@ -186,6 +186,9 @@ public class GameManager
     private readonly GameBoard board;
     private readonly Player player1;
     private readonly Player player2;
+    private int player1Wins;
+    private int player2Wins;
+    private int totalGames;
 
     public GameManager(Player p1, Player p2)
     {
@@ -199,44 +202,54 @@ public class GameManager
         Console.WriteLine("Connect Four Game");
         Console.WriteLine();
 
+        Console.Write("Enter name for Player 1 (X): ");
+        player1.Name = Console.ReadLine();
+
         if (player2 is AIPlayer)
         {
-            Console.Write("Enter your name: ");
-            player1.Name = Console.ReadLine();
+            player2.Name = "AI";
         }
         else
         {
-            Console.Write("Enter name for Player 1 (X): ");
-            player1.Name = Console.ReadLine();
             Console.Write("Enter name for Player 2 (O): ");
             player2.Name = Console.ReadLine();
         }
 
-        board.DisplayBoard();
-
-        Player currentPlayer = player1;
-        while (true)
+        do
         {
-            int column = currentPlayer.GetMove(board);
+            board.InitializeBoard();
+
             board.DisplayBoard();
 
-            if (board.CheckWin(currentPlayer.Symbol))
+            Player currentPlayer = player1;
+            while (true)
             {
-                Console.WriteLine($"{currentPlayer.Name} wins!");
-                break;
+                int column = currentPlayer.GetMove(board);
+                board.DisplayBoard();
+
+                if (board.CheckWin(currentPlayer.Symbol))
+                {
+                    Console.WriteLine($"{currentPlayer.Name} wins!");
+                    UpdateStatistics(currentPlayer);
+                    break;
+                }
+
+                if (board.IsFull())
+                {
+                    Console.WriteLine("It's a draw!");
+                    break;
+                }
+
+                currentPlayer = (currentPlayer == player1) ? player2 : player1;
             }
 
-            if (board.IsFull())
-            {
-                Console.WriteLine("It's a draw!");
-                break;
-            }
+            totalGames++;
 
-            currentPlayer = (currentPlayer == player1) ? player2 : player1;
-        }
+        } while (PlayAgain());
+
+        DisplayStatistics();
     }
-}
-//added replay functionality
+
     private bool PlayAgain()
     {
         while (true)
@@ -244,15 +257,41 @@ public class GameManager
             Console.Write("Do you want to play again? (Y/N): ");
             string input = Console.ReadLine().Trim().ToUpper();
 
-            if (input == "Y" || input == "N")
+            if (input == "Y")
             {
-                return input == "Y";
+                return true;
+            }
+            else if (input == "N")
+            {
+                return false;
             }
             else
             {
                 Console.WriteLine("Invalid input. Please enter 'Y' or 'N'.");
             }
         }
+    }
+
+    private void UpdateStatistics(Player player)
+    {
+        if (player == player1)
+        {
+            player1Wins++;
+        }
+        else
+        {
+            player2Wins++;
+        }
+    }
+
+    private void DisplayStatistics()
+    {
+        Console.WriteLine("Game Statistics:");
+        Console.WriteLine($"Total games played: {totalGames}");
+        Console.WriteLine($"{player1.Name} wins: {player1Wins}");
+        Console.WriteLine($"{player2.Name} wins: {player2Wins}");
+        Console.WriteLine($"Win ratio for {player1.Name}: {(double)player1Wins / totalGames:P2}");
+        Console.WriteLine($"Win ratio for {player2.Name}: {(double)player2Wins / totalGames:P2}");
     }
 }
 
